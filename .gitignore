@@ -361,3 +361,13 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Terraform state files
+terraform.tfstate
+terraform.tfstate.*
+
+# Terraform provider binaries
+.terraform/
+
+# .terraform lock file
+.terraform.lock.hcl
