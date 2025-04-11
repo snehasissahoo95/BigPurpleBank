@@ -37,6 +37,10 @@ jobs:
       run: terraform init
       working-directory: ./Infrastructure
 
+    - name: Terraform Import Resource Group
+      run: terraform import azurerm_resource_group.rg /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/assignmentRG
+      working-directory: ./Infrastructure
+
     - name: Terraform Plan
       run: terraform plan
       working-directory: ./Infrastructure
