@@ -9,8 +9,8 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
+var connectionString = builder.Configuration.GetConnectionString("SqlConnectionString");
+Console.WriteLine($"Connection String: {connectionString}");
 builder.Services.AddDbContext<AccountsDbContext>(options =>
     options.UseSqlServer(connectionString));
 
