@@ -1,4 +1,3 @@
-
 name: Build and Deploy BigPurpleBank API
 
 on:
@@ -11,12 +10,37 @@ env:
   DOTNET_VERSION: '8.0.x'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.6.6
+
+    - name: Azure Login with OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Plan
+      run: terraform plan
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3

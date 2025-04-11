@@ -1,4 +1,5 @@
 variable "location" {
-  type    = string
-  default = "Australia East"
+  description = "The Azure region to deploy resources into"
+  type        = string
+  default     = "AustraliaEast"
 }

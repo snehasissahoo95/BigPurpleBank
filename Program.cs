@@ -9,13 +9,10 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var keyVaultUrl = "https://bigpurplebankkv.vault.azure.net/";
-var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-KeyVaultSecret secret = secretClient.GetSecret("SqlConnectionString");
-string sqlConnectionString = secret.Value;
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<AccountsDbContext>(options =>
-    options.UseSqlServer(sqlConnectionString));
+    options.UseSqlServer(connectionString));
 
 // Add services to the container.
 
@@ -32,7 +29,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AccountsDbContext>(options =>
-    options.UseSqlServer((sqlConnectionString),
+    options.UseSqlServer((connectionString),
      sqlOptions => sqlOptions.EnableRetryOnFailure(
             maxRetryCount: 5,
             maxRetryDelay: TimeSpan.FromSeconds(10),
