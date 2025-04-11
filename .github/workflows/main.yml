@@ -1,34 +1,11 @@
+# .github/workflows/test.yml
+name: Test Workflow
 
-name: Build and Deploy BigPurpleBank API
-
-on:
-  push:
-    branches:
-      - main
-
-env:
-  AZURE_WEBAPP_NAME: BigPurpleBankApp
-  DOTNET_VERSION: '8.0.x'
+on: [push]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_VERSION }}
-
-    - name: Publish .NET App
-      run: dotnet publish -c Release -o publish
-
-    - name: Deploy to Azure Web App
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-        package: publish
+      - name: Echo
+        run: echo "Hello from GitHub Actions!"
