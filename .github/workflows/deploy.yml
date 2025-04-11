@@ -35,12 +35,15 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
+      working-directory: ./Infrastructure
 
     - name: Terraform Plan
       run: terraform plan
+      working-directory: ./Infrastructure
 
     - name: Terraform Apply
       run: terraform apply -auto-approve
+      working-directory: ./Infrastructure
 
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
