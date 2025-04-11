@@ -11,6 +11,11 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  use_oidc        = true
+  client_id       = env("ARM_CLIENT_ID")
+  tenant_id       = env("ARM_TENANT_ID")
+  subscription_id = env("ARM_SUBSCRIPTION_ID")
 }
 
 data "azurerm_client_config" "current" {}
