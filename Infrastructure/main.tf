@@ -1,3 +1,14 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.90"
+    }
+  }
+
+  required_version = ">= 1.6"
+}
+
 provider "azurerm" {
   features {}
 }
@@ -17,7 +28,6 @@ resource "azurerm_key_vault" "vault" {
   resource_group_name         = azurerm_resource_group.rg.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
-  soft_delete_enabled         = true
   purge_protection_enabled    = false
 }
 
@@ -38,7 +48,7 @@ data "azurerm_key_vault_secret" "sql_connection_string" {
 }
 
 # ------------------ APP SERVICE PLAN ------------------
-resource "azurerm_app_service_plan" "asp" {
+resource "azurerm_service_plan" "asp" {
   name                = "ASP-assignmentRG-b26b"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -62,7 +72,7 @@ resource "azurerm_app_service" "app" {
 }
 
 # ------------------ SQL SERVER ------------------
-resource "azurerm_sql_server" "sql" {
+resource "azurerm_mssql_server" "sql" {
   name                         = "bigpurplebank"
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
@@ -72,7 +82,7 @@ resource "azurerm_sql_server" "sql" {
 }
 
 # ------------------ SQL DATABASE ------------------
-resource "azurerm_sql_database" "db" {
+resource "azurerm_mssql_database" "db" {
   name                = "BigPurpleBankDB"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
