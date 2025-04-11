@@ -9,10 +9,13 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("SqlConnectionString");
-Console.WriteLine($"Connection String: {connectionString}");
+var keyVaultUrl = "https://bigpurplebankkv.vault.azure.net/";
+var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+KeyVaultSecret secret = secretClient.GetSecret("SqlConnectionString");
+string sqlConnectionString = secret.Value;
+
 builder.Services.AddDbContext<AccountsDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(sqlConnectionString));
 
 // Add services to the container.
 
