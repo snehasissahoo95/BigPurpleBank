@@ -11,6 +11,8 @@ terraform {
 
 provider "azurerm" {
   features {}
+
+  resource_provider_registrations = "enabled"
 }
 
 data "azurerm_client_config" "current" {}
