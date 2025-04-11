@@ -73,7 +73,8 @@ resource "azurerm_app_service" "app" {
 locals {
   sql_connection_string = data.azurerm_key_vault_secret.sql_connection_string.value
 
-  sql_password = regex("(?<=Password=)[^;]+", local.sql_connection_string)
+  # Extract password from connection string
+  sql_password = regex("Password=([^;]+)", local.sql_connection_string)[0]
 }
 
 # ------------------ SQL SERVER ------------------
