@@ -37,7 +37,7 @@ resource "azurerm_key_vault" "vault" {
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy       = false # allow recreation
+    prevent_destroy       = false # allow recreation if necessary
   }
 }
 
@@ -86,7 +86,7 @@ resource "azurerm_key_vault_secret" "sql_connection_string" {
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy       = false
+    prevent_destroy       = false # recreate secret on every deployment
   }
 }
 
