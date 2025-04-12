@@ -16,6 +16,7 @@ variable "subscription_id" {
 variable "location" {
   description = "The Azure region where the resources will be created"
   type        = string
+  default = "AustraliaEast"
 }
 
 variable "sql_password" {

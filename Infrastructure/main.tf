@@ -17,6 +17,14 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
+variable "client_id" {}
+variable "tenant_id" {}
+variable "subscription_id" {}
+variable "sql_password" {}
+variable "location" {
+  default = "AustraliaEast"
+}
+
 data "azurerm_client_config" "current" {}
 
 # ------------------ RESOURCE GROUP ------------------
