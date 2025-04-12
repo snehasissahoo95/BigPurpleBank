@@ -131,7 +131,16 @@ resource "azurerm_app_service" "app" {
     type = "SystemAssigned"
   }
 
+  source_control {
+    # You can configure source control here (e.g., GitHub, Azure Repos)
+    # Example for GitHub integration
+    repo_url            = "https://github.com/snehasissahoo95/BigPurpleBank"
+    branch              = "master"
+    manual_integration = false
+  }
+
   lifecycle {
-    prevent_destroy = true # protect App Service from being accidentally destroyed
+    prevent_destroy = true
   }
 }
+
