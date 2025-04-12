@@ -41,7 +41,6 @@ resource "azurerm_key_vault" "vault" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
   purge_protection_enabled    = false
-  soft_delete_enabled         = true # Ensure soft delete is on for safe recreation
 
   lifecycle {
     create_before_destroy = true
