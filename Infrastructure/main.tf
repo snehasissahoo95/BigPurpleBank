@@ -45,12 +45,6 @@ resource "azurerm_key_vault_access_policy" "current_user" {
   ]
 }
 
-# ------------------ SECRET ------------------
-data "azurerm_key_vault_secret" "sql_connection_string" {
-  name         = "SqlConnectionString"
-  key_vault_id = azurerm_key_vault.vault.id
-}
-
 # ------------------ APP SERVICE PLAN ------------------
 resource "azurerm_service_plan" "asp" {
   name                = "ASP-assignmentRG-b26b"
@@ -73,14 +67,6 @@ resource "azurerm_app_service" "app" {
   }
 }
 
-# ------------------ LOCAL VARIABLES ------------------
-locals {
-  sql_connection_string = data.azurerm_key_vault_secret.sql_connection_string.value
-
-  # Extract password from connection string
-  sql_password = regex("Password=([^;]+)", local.sql_connection_string)[0]
-}
-
 # ------------------ SQL SERVER ------------------
 resource "azurerm_mssql_server" "sql" {
   name                         = "bigpurplebank"
@@ -88,12 +74,24 @@ resource "azurerm_mssql_server" "sql" {
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
   administrator_login          = "snehasis"
-  administrator_login_password = local.sql_password
+  administrator_login_password = var.sql_password
 }
 
 # ------------------ SQL DATABASE ------------------
 resource "azurerm_mssql_database" "db" {
   name                = "BigPurpleBankDB"
-  server_id      = azurerm_mssql_server.sql.id
+  server_id           = azurerm_mssql_server.sql.id
   sku_name            = "GP_S_Gen5_2"
+}
+
+# ------------------ KEY VAULT SECRET FOR CONNECTION STRING ------------------
+resource "azurerm_key_vault_secret" "sql_connection_string" {
+  name         = "SqlConnectionString"
+  value        = "Server=tcp:${azurerm_mssql_server.sql.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.sql.administrator_login};Password=${var.sql_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+  key_vault_id = azurerm_key_vault.vault.id
+}
+
+# ------------------ LOCAL VARIABLES ------------------
+locals {
+  sql_connection_string = data.azurerm_key_vault_secret.sql_connection_string.value
 }

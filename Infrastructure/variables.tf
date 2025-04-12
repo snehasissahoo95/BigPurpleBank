@@ -18,3 +18,9 @@ variable "subscription_id" {
   description = "The Subscription ID for Azure"
   type        = string
 }
+
+variable "sql_password" {
+  description = "The password for the SQL Server administrator account"
+  type        = string
+  sensitive   = true
+}
