@@ -1,5 +1,4 @@
 ﻿using BigPurpleBank.Application.Interfaces;
-using BigPurpleBank.Data;
 using BigPurpleBank.Model.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,21 +7,17 @@ using Microsoft.EntityFrameworkCore;
 [Route("banking/accounts")]
 public class AccountsController : ControllerBase
 {
-    private readonly AccountsDbContext _context;
-    private readonly IAccountQueryService _accountQueryService;
+    private readonly IAccountService _accountService;
 
-    public AccountsController(AccountsDbContext context, IAccountQueryService accountQueryService)
+    public AccountsController(IAccountService accountService)
     {
-        _context = context;
-        _accountQueryService = accountQueryService;
+        _accountService = accountService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAccounts([FromQuery] AccountFilter filter)
     {
-        var query = _context.Accounts.AsQueryable();
-
-        query = _accountQueryService.ApplyFilter(query, filter);
+        var query = await _accountService.GetAccountsAsync(filter);
 
         var totalRecords = await query.CountAsync();
         var accounts = await query

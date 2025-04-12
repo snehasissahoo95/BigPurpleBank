@@ -21,6 +21,7 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddScoped<IAccountQueryService, AccountQueryService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
