@@ -55,14 +55,16 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
 
-    # Terraform Plan
-    - name: Terraform Plan
-      run: terraform plan -destroy
+    # Terraform Plan - Taint Key Vault for recreation
+    - name: Terraform Plan (Taint Key Vault)
+      run: |
+        terraform taint azurerm_key_vault.vault
+        terraform plan
       working-directory: ./Infrastructure
       env:
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
 
-    # Terraform Apply (to destroy and recreate resources)
+    # Terraform Apply
     - name: Terraform Apply
       run: terraform apply -auto-approve
       working-directory: ./Infrastructure

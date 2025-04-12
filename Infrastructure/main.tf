@@ -33,10 +33,11 @@ resource "azurerm_key_vault" "vault" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
   purge_protection_enabled    = false
+  soft_delete_enabled         = true # Ensure soft delete is on for safe recreation
 
   lifecycle {
     create_before_destroy = true
-    prevent_destroy       = false
+    prevent_destroy       = false # allow recreation
   }
 }
 
@@ -46,40 +47,8 @@ resource "azurerm_key_vault_access_policy" "current_user" {
   object_id    = data.azurerm_client_config.current.object_id
 
   secret_permissions = [
-    "Get"
+    "Get", "List", "Set", "Delete"
   ]
-}
-
-# ------------------ APP SERVICE PLAN ------------------
-resource "azurerm_service_plan" "asp" {
-  name                = "ASP-assignmentRG-b26b"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  os_type             = "Windows"
-  sku_name            = "F1"
-
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy       = false
-  }
-}
-
-# ------------------ APP SERVICE ------------------
-resource "azurerm_app_service" "app" {
-  name                = "BigPurpleBankApp"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  app_service_plan_id = azurerm_service_plan.asp.id
-
-  app_settings = {
-    "ASPNETCORE_ENVIRONMENT"      = "Production"
-    "ConnectionStrings__DefaultConnection" = data.azurerm_key_vault_secret.sql_connection_string.value
-  }
-
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy       = false
-  }
 }
 
 # ------------------ SQL SERVER ------------------
@@ -99,9 +68,9 @@ resource "azurerm_mssql_server" "sql" {
 
 # ------------------ SQL DATABASE ------------------
 resource "azurerm_mssql_database" "db" {
-  name                = "BigPurpleBankDB"
-  server_id           = azurerm_mssql_server.sql.id
-  sku_name            = "GP_S_Gen5_2"
+  name      = "BigPurpleBankDB"
+  server_id = azurerm_mssql_server.sql.id
+  sku_name  = "GP_S_Gen5_2"
 
   lifecycle {
     create_before_destroy = true
@@ -114,9 +83,48 @@ resource "azurerm_key_vault_secret" "sql_connection_string" {
   name         = "SqlConnectionString"
   value        = "Server=tcp:${azurerm_mssql_server.sql.fully_qualified_domain_name},1433;Initial Catalog=${azurerm_mssql_database.db.name};Persist Security Info=False;User ID=${azurerm_mssql_server.sql.administrator_login};Password=${var.sql_password};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
   key_vault_id = azurerm_key_vault.vault.id
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
-# ------------------ LOCAL VARIABLES ------------------
-locals {
-  sql_connection_string = data.azurerm_key_vault_secret.sql_connection_string.value
+# ------------------ SERVICE PLAN ------------------
+resource "azurerm_service_plan" "asp" {
+  name                = "ASP-assignmentRG-b26b"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  os_type             = "Windows"
+  sku_name            = "F1"
+
+  lifecycle {
+    prevent_destroy = true # prevent deletion of app service plan
+  }
+}
+
+# ------------------ APP SERVICE ------------------
+data "azurerm_key_vault_secret" "sql_connection_string" {
+  name         = azurerm_key_vault_secret.sql_connection_string.name
+  key_vault_id = azurerm_key_vault.vault.id
+}
+
+resource "azurerm_app_service" "app" {
+  name                = "BigPurpleBankApp"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_service_plan.asp.id
+
+  app_settings = {
+    "ASPNETCORE_ENVIRONMENT"             = "Production"
+    "ConnectionStrings__DefaultConnection" = data.azurerm_key_vault_secret.sql_connection_string.value
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  lifecycle {
+    prevent_destroy = true # protect App Service from being accidentally destroyed
+  }
 }
