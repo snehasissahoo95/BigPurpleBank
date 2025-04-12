@@ -14,13 +14,13 @@ namespace BigPurpleBank.Tests
     public class AccountServiceTests
     {
         private Mock<IAccountQueryService> _mockQueryService;
+        private Mock<ILogger<AccountService>> _mockLogger;
         private AccountsDbContext _context;
         private AccountService _accountService;
 
         [SetUp]
         public void Setup()
         {
-            // In-memory database for mocking DbSet structure (not persistent)
             var options = new DbContextOptionsBuilder<AccountsDbContext>()
                 .UseInMemoryDatabase(databaseName: "Test_AccountsDb")
                 .Options;
@@ -67,7 +67,9 @@ namespace BigPurpleBank.Tests
             _context.SaveChanges();
 
             _mockQueryService = new Mock<IAccountQueryService>();
-            _accountService = new AccountService(_context, _mockQueryService.Object);
+            _mockLogger = new Mock<ILogger<AccountService>>();
+
+            _accountService = new AccountService(_context, _mockQueryService.Object, _mockLogger.Object);
         }
 
         [Test]
@@ -93,7 +95,6 @@ namespace BigPurpleBank.Tests
             var filter = new AccountFilter { ProductCategory = ProductCategory.BUSINESS_LOANS };
             var allAccounts = _context.Accounts.AsQueryable();
             var filteredAccounts = allAccounts.Where(a => a.ProductCategory == ProductCategory.BUSINESS_LOANS);
-
 
             _mockQueryService
                 .Setup(s => s.ApplyFilter(It.IsAny<IQueryable<Account>>(), filter))
