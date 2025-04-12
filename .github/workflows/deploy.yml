@@ -58,7 +58,6 @@ jobs:
     # Terraform Plan - Taint Key Vault Secret for recreation
     - name: Terraform Plan (Taint Key Vault Secret)
       run: |
-        terraform taint azurerm_key_vault_secret.sql_connection_string
         terraform plan -var="client_id=${{ secrets.ARM_CLIENT_ID }}" -var="tenant_id=${{ secrets.ARM_TENANT_ID }}" -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -var="sql_password=${{ secrets.SQL_PASSWORD }}"
       working-directory: ./Infrastructure
 
