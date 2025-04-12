@@ -1,11 +1,9 @@
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
 using BigPurpleBank.Application.Interfaces;
 using BigPurpleBank.Application.Services;
 using BigPurpleBank.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +38,13 @@ builder.Services.AddDbContext<AccountsDbContext>(options =>
 
 
 var app = builder.Build();
+
+// Apply migrations and seed data on startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AccountsDbContext>();
+    dbContext.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
