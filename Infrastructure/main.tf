@@ -33,6 +33,11 @@ resource "azurerm_key_vault" "vault" {
   tenant_id                   = data.azurerm_client_config.current.tenant_id
   sku_name                    = "standard"
   purge_protection_enabled    = false
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
 resource "azurerm_key_vault_access_policy" "current_user" {
@@ -51,7 +56,12 @@ resource "azurerm_service_plan" "asp" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Windows"
-  sku_name            = "F1" 
+  sku_name            = "F1"
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
 # ------------------ APP SERVICE ------------------
@@ -65,6 +75,11 @@ resource "azurerm_app_service" "app" {
     "ASPNETCORE_ENVIRONMENT"      = "Production"
     "ConnectionStrings__DefaultConnection" = data.azurerm_key_vault_secret.sql_connection_string.value
   }
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
 # ------------------ SQL SERVER ------------------
@@ -75,6 +90,11 @@ resource "azurerm_mssql_server" "sql" {
   version                      = "12.0"
   administrator_login          = "snehasis"
   administrator_login_password = var.sql_password
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
 # ------------------ SQL DATABASE ------------------
@@ -82,6 +102,11 @@ resource "azurerm_mssql_database" "db" {
   name                = "BigPurpleBankDB"
   server_id           = azurerm_mssql_server.sql.id
   sku_name            = "GP_S_Gen5_2"
+
+  lifecycle {
+    create_before_destroy = true
+    prevent_destroy       = false
+  }
 }
 
 # ------------------ KEY VAULT SECRET FOR CONNECTION STRING ------------------

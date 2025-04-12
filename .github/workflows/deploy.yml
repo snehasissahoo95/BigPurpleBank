@@ -57,12 +57,12 @@ jobs:
 
     # Terraform Plan
     - name: Terraform Plan
-      run: terraform plan
+      run: terraform plan -destroy
       working-directory: ./Infrastructure
       env:
         SQL_PASSWORD: ${{ secrets.SQL_PASSWORD }}
 
-    # Terraform Apply
+    # Terraform Apply (to destroy and recreate resources)
     - name: Terraform Apply
       run: terraform apply -auto-approve
       working-directory: ./Infrastructure
