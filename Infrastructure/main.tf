@@ -29,7 +29,7 @@ data "azurerm_client_config" "current" {}
 
 # ------------------ RESOURCE GROUP ------------------
 resource "azurerm_resource_group" "rg" {
-  name     = "assignmentRG"
+  name     = "demoRG"
   location = var.location
 }
 
@@ -64,7 +64,7 @@ resource "azurerm_mssql_server" "sql" {
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
-  administrator_login          = "snehasis"
+  administrator_login          = "user"
   administrator_login_password = var.sql_password
 
   lifecycle {
@@ -99,7 +99,7 @@ resource "azurerm_key_vault_secret" "sql_connection_string" {
 
 # ------------------ SERVICE PLAN ------------------
 resource "azurerm_service_plan" "asp" {
-  name                = "ASP-assignmentRG-b26b"
+  name                = "ASP-demoRG-b26b"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_type             = "Windows"

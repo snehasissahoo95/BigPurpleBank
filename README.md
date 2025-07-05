@@ -1,4 +1,8 @@
-# BigPurpleBank
+﻿# BigPurpleBank
+
+> **Note**: This is a demo repository created for reference purposes only.  
+> It demonstrates how to provision Azure cloud infrastructure using Terraform scripts.  
+> You can use this as a starting point to understand and build your own infrastructure on Azure.
 
 ## Overview
 
